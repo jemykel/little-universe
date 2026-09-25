@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>our little universe</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --night: #080b18;
+  --night2: #10162b;
+  --cream: #eee8d8;
+  --muted: #aaa89e;
+  --gold: #d8bd77;
+
+  --yellow: #f7e8a9;
+  --pink: #f6cbd5;
+  --pink2: #f8dce2;
+  --brown: #765c50;
+  --darkpink: #684b55;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--night);
+  color: var(--cream);
+  font-family: "DM Mono", monospace;
+}
+
+/* ---------- LIGHTWEIGHT STAR FIELD ---------- */
+
+.space {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(77,91,145,.14), transparent 28%),
+    radial-gradient(circle at 80% 75%, rgba(103,76,119,.12), transparent 30%),
+    linear-gradient(145deg, #070a16, #10162a 55%, #080b18);
+}
+
+.stars {
+  position: absolute;
+  inset: 0;
+  opacity: .7;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.75) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(216,189,119,.5) 1px, transparent 1.5px);
+  background-size: 83px 91px, 137px 121px;
+  background-position: 8px 12px, 44px 63px;
+}
+
+.space::after {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(92,110,166,.08),
+    transparent 68%
+  );
+}
+
+/* ---------- ROOMS ---------- */
+
+#app {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.room {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 2;
+}
+
+.room.active {
+  display: flex;
+}
+
+.room.fade-out {
+  animation: fadeOut .28s ease forwards;
+}
+
+.room.fade-in {
+  animation: fadeIn .45s ease forwards;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(.985); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(1.015); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ---------- TYPOGRAPHY ---------- */
+
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 15px;
+}
+
+.title {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(31px, 5vw, 58px);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.subtitle {
+  margin-top: 15px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.center {
+  text-align: center;
+}
+
+/* ---------- BUTTON ---------- */
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.nav-btn {
+  position: absolute;
+  bottom: 27px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+
+  border: 1px solid rgba(238,232,216,.25);
+  background: rgba(8,11,24,.72);
+  color: var(--cream);
+  padding: 10px 17px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  transition: .2s ease;
+}
+
+.nav-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.nav-btn.hidden {
+  display: none;
+}
+
+.back-btn {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 60;
+  border: 0;
+  background: transparent;
+  color: rgba(238,232,216,.55);
+  font-size: 10px;
+}
+
+.back-btn:hover {
+  color: var(--cream);
+}
+
+/* ---------- PASSWORD ---------- */
+
+.password-box {
+  width: min(360px, 90vw);
+  text-align: center;
+}
+
+.password-box input {
+  width: 100%;
+  margin-top: 25px;
+  padding: 13px 14px;
+  border: 1px solid rgba(238,232,216,.22);
+  background: rgba(255,255,255,.035);
+  color: var(--cream);
+  text-align: center;
+  outline: none;
+  font: inherit;
+  font-size: 12px;
+}
+
+.password-box input:focus {
+  border-color: rgba(216,189,119,.7);
+}
+
+.password-box button {
+  margin-top: 10px;
+  padding: 11px 22px;
+  border: 1px solid rgba(216,189,119,.45);
+  background: transparent;
+  color: var(--gold);
+  font-size: 10px;
+}
+
+.wrong {
+  min-height: 17px;
+  margin-top: 12px;
+  color: #bd8c8c;
+  font-size: 10px;
+}
+
+/* ---------- CONSTELLATION OPENING ---------- */
+
+.constellation {
+  position: relative;
+  width: min(720px, 92vw);
+  height: min(520px, 70vh);
+}
+
+.constellation svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.constellation-line {
+  stroke: rgba(216,189,119,.42);
+  stroke-width: 1;
+  stroke-dasharray: 3 7;
+}
+
+.star-point {
+  fill: #eee8d8;
+}
+
+.star-point.big {
+  fill: #d8bd77;
+}
+
+.name {
+  position: absolute;
+  z-index: 5;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(20px, 3.2vw, 34px);
+  letter-spacing: 1px;
+  color: var(--cream);
+}
+
+.name small {
+  display: block;
+  margin-bottom: 7px;
+  font-family: "DM Mono", monospace;
+  font-size: 8px;
+  letter-spacing: 3px;
+  color: var(--gold);
+}
+
+.jeremy {
+  left: 11%;
+  top: 25%;
+}
+
+.blair {
+  right: 8%;
+  bottom: 25%;
+  text-align: right;
+}
+
+.constellation-note {
+  position: absolute;
+  left: 50%;
+  bottom: 7%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: rgba(238,232,216,.48);
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+/* ---------- GENERAL CARD ---------- */
+
+.card {
+  width: min(650px, 90vw);
+  max-height: 74vh;
+  overflow: hidden;
+  padding: 35px;
+  border: 1px solid rgba(238,232,216,.13);
+  background: rgba(10,14,29,.7);
+  position: relative;
+  z-index: 5;
+}
+
+.card h2 {
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+  font-size: clamp(25px, 4vw, 38px);
+  margin-bottom: 20px;
+}
+
+.story {
+  color: #c3c0b6;
+  font-size: 11px;
+  line-height: 2;
+}
+
+.story p {
+  margin-bottom: 12px;
+}
+
+/* ---------- QUIZ ---------- */
+
+.quiz-card {
+  width: min(650px, 92vw);
+}
+
+.question-count {
+  color: var(--gold);
+  font-size: 9px;
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+}
+
+.question {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(21px, 3vw, 31px);
+  line-height: 1.25;
+  margin-bottom: 22px;
+}
+
+.answers {
+  display: grid;
+  gap: 7px;
+}
+
+.answer {
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(238,232,216,.13);
+  background: rgba(255,255,255,.025);
+  color: #d6d2c7;
+  padding: 11px 13px;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.answer:hover {
+  border-color: rgba(216,189,119,.55);
+  color: var(--cream);
+}
+
+.quiz-loading,
+.quiz-result {
+  text-align: center;
+}
+
+.loading-text {
+  font-size: 11px;
+  line-height: 2;
+  color: var(--muted);
+}
+
+.loading-bar {
+  width: 230px;
+  height: 2px;
+  background: rgba(255,255,255,.1);
+  margin: 20px auto;
+  overflow: hidden;
+}
+
+.loading-bar span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--gold);
+  animation: loading 2.2s linear forwards;
+}
+
+@keyframes loading {
+  to { width: 100%; }
+}
+
+.result-title {
+  font-family: "Playfair Display", serif;
+  font-size: 29px;
+  margin-bottom: 12px;
+}
+
+/* ---------- PLANETS ---------- */
+
+.planets-wrap {
+  width: min(900px, 94vw);
+  text-align: center;
+}
+
+.planet-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 3vw, 30px);
+  margin-top: 38px;
+  flex-wrap: nowrap;
+}
+
+.planet {
+  position: relative;
+  width: clamp(58px, 9vw, 90px);
+  height: clamp(58px, 9vw, 90px);
+  border-radius: 50%;
+  border: 1px solid rgba(238,232,216,.2);
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,.25), transparent 28%),
+    rgba(255,255,255,.035);
+  color: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Playfair Display", serif;
+  font-size: 12px;
+  transition: .2s;
+}
+
+.planet:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold);
+}
+
+.planet.saturn::before {
+  content: "";
+  position: absolute;
+  width: 125%;
+  height: 27%;
+  border: 1px solid rgba(216,189,119,.6);
+  border-radius: 50%;
+  transform: rotate(-18deg);
+}
+
+.planet-message {
+  width: min(560px, 88vw);
+  min-height: 145px;
+  margin: 28px auto 0;
+  padding: 20px;
+  border: 1px solid rgba(238,232,216,.1);
+  background: rgba(255,255,255,.025);
+}
+
+.planet-message .pm-title {
+  color: var(--gold);
+  font-size: 10px;
+  letter-spacing: 2px;
+  margin-bottom: 9px;
+}
+
+.planet-message .pm-text {
+  color: #c9c6bd;
+  font-size: 10px;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+/* ---------- LITTLE THINGS ---------- */
+
+.things-grid {
+  width: min(850px, 92vw);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.thing-card {
+  padding: 21px;
+  min-height: 155px;
+  border: 1px solid rgba(238,232,216,.12);
+  background: rgba(255,255,255,.025);
+}
+
+.thing-card h3 {
+  color: var(--gold);
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+  font-size: 19px;
+  margin-bottom: 10px;
+}
+
+.thing-card p {
+  color: #bbb8af;
+  font-size: 9px;
+  line-height: 1.75;
+}
+
+/* ---------- BLAIR WORLD ---------- */
+
+.blair-room {
+  color: var(--brown);
+}
+
+.blair-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(255,255,255,.48), transparent 22%),
+    radial-gradient(circle at 86% 82%, rgba(255,255,255,.38), transparent 25%),
+    linear-gradient(135deg, var(--yellow), var(--pink2));
+}
+
+.blair-deco {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  opacity: .8;
+  font-size: clamp(17px, 2.5vw, 27px);
+}
+
+.deco1 { left: 7%; top: 13%; }
+.deco2 { right: 8%; top: 15%; }
+.deco3 { left: 12%; bottom: 15%; }
+.deco4 { right: 12%; bottom: 12%; }
+
+.blair-content {
+  width: min(850px, 92vw);
+  position: relative;
+  z-index: 10;
+}
+
+.blair-eyebrow {
+  color: #98715e;
+  font-size: 9px;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+}
+
+.blair-title {
+  font-family: "Playfair Display", serif;
+  color: var(--darkpink);
+  font-size: clamp(32px, 6vw, 58px);
+  font-weight: 400;
+}
+
+/* ---------- BLAIR CARDS ---------- */
+
+.favorite-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 11px;
+  margin-top: 24px;
+}
+
+.favorite {
+  min-height: 105px;
+  border: 1px solid rgba(118,92,80,.18);
+  background: rgba(255,255,255,.48);
+  padding: 16px;
+  text-align: left;
+  color: var(--brown);
+  transition: .2s;
+}
+
+.favorite:hover {
+  transform: translateY(-3px) rotate(-.5deg);
+}
+
+.favorite .emoji {
+  font-size: 18px;
+}
+
+.favorite strong {
+  display: block;
+  margin: 8px 0 4px;
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+  font-size: 17px;
+}
+
+.favorite small {
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+/* ---------- WHY YOU ---------- */
+
+.why-box {
+  width: min(680px, 90vw);
+  min-height: 340px;
+  padding: 30px;
+  background: rgba(255,255,255,.42);
+  border: 1px solid rgba(118,92,80,.18);
+  text-align: center;
+}
+
+.why-kicker {
+  font-size: 9px;
+  letter-spacing: 2px;
+  margin-bottom: 25px;
+  color: #98715e;
+}
+
+.why-line {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(23px, 4vw, 34px);
+  color: var(--darkpink);
+  margin-bottom: 13px;
+}
+
+.why-text {
+  max-width: 540px;
+  margin: auto;
+  color: var(--brown);
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+/* ---------- SCRAPBOOK ---------- */
+
+.scrapbook {
+  position: relative;
+  width: min(900px, 93vw);
+  height: min(600px, 78vh);
+}
+
+.paper {
+  position: absolute;
+  width: min(390px, 47vw);
+  padding: 22px;
+  background: rgba(255,252,240,.8);
+  border: 1px solid rgba(118,92,80,.15);
+  color: var(--brown);
+  box-shadow: 0 5px 18px rgba(95,65,55,.08);
+}
+
+.paper h3 {
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+  font-size: 21px;
+  margin-bottom: 8px;
+  color: var(--darkpink);
+}
+
+.paper p {
+  font-size: 9px;
+  line-height: 1.7;
+}
+
+.paper.one {
+  left: 4%;
+  top: 9%;
+  transform: rotate(-3deg);
+}
+
+.paper.two {
+  right: 5%;
+  top: 5%;
+  transform: rotate(2.5deg);
+}
+
+.paper.three {
+  left: 14%;
+  bottom: 6%;
+  transform: rotate(2deg);
+}
+
+.paper.four {
+  right: 13%;
+  bottom: 8%;
+  transform: rotate(-2.5deg);
+}
+
+.tape {
+  position: absolute;
+  width: 72px;
+  height: 18px;
+  background: rgba(246,203,213,.7);
+  transform: rotate(-5deg);
+  top: -9px;
+  left: 50%;
+  pointer-events: none;
+}
+
+.scrap-deco {
+  position: absolute;
+  pointer-events: none;
+  font-size: 25px;
+  z-index: 3;
+}
+
+.flower1 { left: 1%; top: 40%; }
+.flower2 { right: 1%; top: 43%; }
+.butterfly1 { left: 47%; top: 1%; }
+.butterfly2 { right: 39%; bottom: 0; }
+
+/* ---------- GOODBYE / DEEP SPACE ---------- */
+
+.goodbye-card,
+.deep-card,
+.ending-card {
+  width: min(650px, 90vw);
+  text-align: center;
+}
+
+.goodbye-card p,
+.deep-card p,
+.ending-card p {
+  color: #c4c0b5;
+  font-size: 10px;
+  line-height: 2;
+  margin-bottom: 12px;
+}
+
+.deep-card .big-line {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(23px, 4vw, 34px);
+  color: var(--cream);
+  margin-bottom: 22px;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 650px) {
+  .room {
+    padding: 18px;
+  }
+
+  .card {
+    padding: 25px 20px;
+    max-height: 76vh;
+  }
+
+  .things-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .thing-card {
+    min-height: 145px;
+    padding: 16px;
+  }
+
+  .favorite-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .favorite {
+    min-height: 94px;
+    padding: 13px;
+  }
+
+  .favorite strong {
+    font-size: 15px;
+  }
+
+  .paper {
+    width: 44vw;
+    padding: 15px;
+  }
+
+  .paper h3 {
+    font-size: 17px;
+  }
+
+  .paper p {
+    font-size: 8px;
+  }
+
+  .planet-message {
+    min-height: 135px;
+    margin-top: 20px;
+  }
+
+  .planet-row {
+    margin-top: 27px;
+    gap: 9px;
+  }
+}
+
+@media (max-width: 430px) {
+  .name {
+    font-size: 19px;
+  }
+
+  .jeremy {
+    left: 5%;
+  }
+
+  .blair {
+    right: 5%;
+  }
+
+  .things-grid {
+    gap: 7px;
+  }
+
+  .thing-card {
+    min-height: 137px;
+    padding: 13px;
+  }
+
+  .thing-card h3 {
+    font-size: 16px;
+  }
+
+  .thing-card p {
+    font-size: 8px;
+  }
+
+  .favorite-grid {
+    gap: 7px;
+  }
+
+  .favorite {
+    min-height: 91px;
+  }
+
+  .paper {
+    width: 45vw;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+  <div class="space">
+    <div class="stars"></div>
+  </div>
+
+  <!-- ================= PASSWORD 1 ================= -->
+
+  <section class="room active" id="password">
+    <div class="password-box">
+      <div class="eyebrow">a tiny universe</div>
+      <h1 class="title">before we begin.</h1>
+      <p class="subtitle">
+        there is a password.<br>
+        you probably know it already.
+      </p>
+
+      <input
+        id="mainInput"
+        type="password"
+        autocomplete="off"
+        placeholder="enter password"
+      >
+
+      <button onclick="checkMainPassword()">enter</button>
+      <div class="wrong" id="mainWrong"></div>
+    </div>
+  </section>
+
+  <!-- ================= OPENING CONSTELLATION ================= -->
+
+  <section class="room" id="sky">
+
+    <div class="constellation">
+
+      <svg viewBox="0 0 720 520" preserveAspectRatio="none">
+        <line class="constellation-line" x1="115" y1="135" x2="240" y2="205"/>
+        <line class="constellation-line" x1="240" y1="205" x2="365" y2="145"/>
+        <line class="constellation-line" x1="365" y1="145" x2="500" y2="275"/>
+        <line class="constellation-line" x1="500" y1="275" x2="615" y2="365"/>
+        <line class="constellation-line" x1="240" y1="205" x2="500" y2="275"/>
+
+        <circle class="star-point big" cx="115" cy="135" r="4"/>
+        <circle class="star-point" cx="240" cy="205" r="2.5"/>
+        <circle class="star-point" cx="365" cy="145" r="3"/>
+        <circle class="star-point big" cx="500" cy="275" r="4"/>
+        <circle class="star-point" cx="615" cy="365" r="3"/>
+
+        <circle class="star-point" cx="178" cy="315" r="2"/>
+        <circle class="star-point" cx="420" cy="390" r="2"/>
+        <circle class="star-point" cx="575" cy="120" r="2"/>
+      </svg>
+
+      <div class="name jeremy">
+        <small>01</small>
+        JEREMY KAEL
+      </div>
+
+      <div class="name blair">
+        <small>02</small>
+        BLAIR MITH
+      </div>
+
+      <div class="constellation-note">
+        two names. one little sky.
+      </div>
+
+    </div>
+
+    <button class="nav-btn" onclick="goTo('story')">
+      continue →
+    </button>
+  </section>
+
+  <!-- ================= STORY ================= -->
+
+  <section class="room" id="story">
+    <button class="back-btn" onclick="goTo('sky')">← back</button>
+
+    <div class="card">
+      <div class="eyebrow">our story</div>
+
+      <h2>so, how did this happen?</h2>
+
+      <div class="story">
+        <p>We met in a bot.</p>
+
+        <p>
+          Nothing particularly dramatic.
+          At first, we were just friends, talking about random things
+          and somehow getting used to having each other around.
+        </p>
+
+        <p>
+          Then Jere started feeling something.
+          It was subtle at first.
+          Until one day, whenever Blair wasn't around,
+          something just felt... missing.
+        </p>
+
+        <p>
+          Jere wanted to confess.
+          He really did.
+          But what if Blair said no?
+          What if confessing ruined everything?
+        </p>
+
+        <p>
+          So, for a while, Jere kept it to himself.
+        </p>
+
+        <p>
+          But somewhere along the way, he realized
+          he didn't just like talking to Blair.
+          He liked <i>all of Blair.</i>
+        </p>
+
+        <p>
+          And, unfortunately for him,
+          he was already way too far gone. &gt;:3
+        </p>
+      </div>
+    </div>
+
+    <button class="nav-btn" onclick="goTo('quiz')">
+      next →
+    </button>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+
+  <section class="room" id="quiz">
+
+    <div class="quiz-card">
+      <div id="quizContent">
+
+        <div class="question-count" id="questionCount"></div>
+        <div class="question" id="question"></div>
+
+        <div class="answers" id="answers"></div>
+
+      </div>
+
+      <div class="quiz-loading" id="quizLoading" style="display:none;">
+        <div class="loading-text">
+          checking your answers...<br>
+          questioning Jere's judgement...
+        </div>
+
+        <div class="loading-bar">
+          <span></span>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult" style="display:none;">
+        <div class="result-title" id="resultTitle"></div>
+        <div class="subtitle" id="resultText"></div>
+
+        <button class="nav-btn" onclick="goTo('planets')">
+          continue →
+        </button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ================= PLANETS ================= -->
+
+  <section class="room" id="planets">
+
+    <div class="planets-wrap">
+      <div class="eyebrow">little planets</div>
+      <h1 class="title">our tiny solar system.</h1>
+
+      <div class="planet-row">
+        <button class="planet" onclick="planet('sun')">sun</button>
+        <button class="planet" onclick="planet('moon')">moon</button>
+        <button class="planet saturn" onclick="planet('saturn')">saturn</button>
+        <button class="planet" onclick="planet('earth')">earth</button>
+        <button class="planet" onclick="planet('little')">?</button>
+      </div>
+
+      <div class="planet-message">
+        <div class="pm-title" id="pmTitle">pick a planet.</div>
+        <div class="pm-text" id="pmText">
+          there's probably something here.
+        </div>
+      </div>
+    </div>
+
+    <button
+      class="nav-btn hidden"
+      id="planetNext"
+      onclick="goTo('things')"
+    >
+      next →
+    </button>
+
+  </section>
+
+  <!-- ================= LITTLE THINGS ================= -->
+
+  <section class="room" id="things">
+
+    <div>
+      <div class="eyebrow center">little things</div>
+
+      <div class="things-grid">
+
+        <div class="thing-card">
+          <h3>the jokes</h3>
+          <p>
+            Our jokes have absolutely no direction.
+            One conversation can start somewhere normal
+            and somehow end somewhere neither of us understands.
+            <br><br>
+            We don't have inside jokes anymore.
+            We have inside everything.
+          </p>
+        </div>
+
+        <div class="thing-card">
+          <h3>random Jere</h3>
+          <p>
+            Jere really, really likes falling asleep.
+            He can be chatting normally,
+            disappear for approximately one minute,
+            and suddenly—
+            <br><br>
+            gone.
+            <br>
+            Man down.
+          </p>
+        </div>
+
+        <div class="thing-card">
+          <h3>things we say</h3>
+          <p>
+            Some words are just different when they come from us.
+            <br><br>
+            bebe<br>
+            i love u most
+            <br><br>
+            And sometimes there are sentences
+            that make absolutely no sense to anyone else.
+          </p>
+        </div>
+
+        <div class="thing-card">
+          <h3>our secret language</h3>
+          <p>
+            We don't really have one specific secret code.
+            We just somehow understand things other people probably wouldn't.
+            <br><br>
+            And then there's the whisper messages.
+            A tiny corner in the middle of everyone else.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <button class="nav-btn" onclick="goTo('flutershyPassword')">
+      continue →
+    </button>
+
+  </section>
+
+  <!-- ================= FLUTERSHY PASSWORD ================= -->
+
+  <section class="room" id="flutershyPassword">
+
+    <div class="password-box">
+      <div class="eyebrow">one more thing.</div>
+      <h1 class="title">there's another little door.</h1>
+
+      <p class="subtitle">
+        clue:<br>
+        your dream character.
+      </p>
+
+      <input
+        id="flutershyInput"
+        type="password"
+        autocomplete="off"
+        placeholder="enter password"
+      >
+
+      <button onclick="checkFlutershy()">open</button>
+
+      <div class="wrong" id="flutershyWrong"></div>
+    </div>
+
+  </section>
+
+  <!-- ================= BLAIR WORLD / CARDS ================= -->
+
+  <section class="room blair-room" id="cards">
+
+    <div class="blair-bg"></div>
+
+    <div class="blair-deco deco1">🌼</div>
+    <div class="blair-deco deco2">🦋</div>
+    <div class="blair-deco deco3">🌷</div>
+    <div class="blair-deco deco4">✨</div>
+
+    <div class="blair-content">
+      <div class="blair-eyebrow">BLAIR'S WORLD</div>
+      <h1 class="blair-title">things that are very Blair.</h1>
+
+      <div class="favorite-grid">
+
+        <button class="favorite" onclick="showFavorite('romcom')">
+          <span class="emoji">🎬</span>
+          <strong>romcom</strong>
+          <small>click me.</small>
+        </button>
+
+        <button class="favorite" onclick="showFavorite('olivia')">
+          <span class="emoji">🎧</span>
+          <strong>Olivia Rodrigo</strong>
+          <small>obviously.</small>
+        </button>
+
+        <button class="favorite" onclick="showFavorite('teh')">
+          <span class="emoji">🧋</span>
+          <strong>teh tarik</strong>
+          <small>serious business.</small>
+        </button>
+
+        <button class="favorite" onclick="showFavorite('thai')">
+          <span class="emoji">🥤</span>
+          <strong>thai tea</strong>
+          <small>also serious.</small>
+        </button>
+
+        <button class="favorite" onclick="showFavorite('dimsum')">
+          <span class="emoji">🥟</span>
+          <strong>dimsum</strong>
+          <small>non-negotiable.</small>
+        </button>
+
+        <button class="favorite" onclick="showFavorite('pipup')">
+          <span class="emoji">🌸</span>
+          <strong>pipup</strong>
+          <small>yes. pipup.</small>
+        </button>
+
+      </div>
+
+      <div
+        id="favoriteText"
+        style="
+          text-align:center;
+          margin-top:18px;
+          min-height:20px;
+          font-size:9px;
+          color:#765c50;
+        "
+      ></div>
+    </div>
+
+    <button class="nav-btn" style="color:#765c50;border-color:rgba(118,92,80,.3);background:rgba(255,255,255,.35);" onclick="goTo('why')">
+      next →
+    </button>
+
+  </section>
+
+  <!-- ================= WHY YOU ================= -->
+
+  <section class="room blair-room" id="why">
+
+    <div class="blair-bg"></div>
+
+    <div class="blair-deco deco1">🌸</div>
+    <div class="blair-deco deco2">🦋</div>
+    <div class="blair-deco deco4">💗</div>
+
+    <div class="why-box">
+
+      <div class="why-kicker">WHY YOU?</div>
+
+      <div id="whyContent">
+        <div class="why-line">why you.</div>
+        <div class="why-text">
+          there are a few things i could tell you.
+        </div>
+      </div>
+
+      <button
+        id="whyButton"
+        onclick="nextWhy()"
+        style="
+          margin-top:25px;
+          border:1px solid rgba(118,92,80,.3);
+          background:rgba(255,255,255,.35);
+          color:#684b55;
+          padding:10px 17px;
+          font:inherit;
+          font-size:9px;
+        "
+      >
+        tell me.
+      </button>
+
+    </div>
+
+  </section>
+
+  <!-- ================= FLUTERSHY SCRAPBOOK ================= -->
+
+  <section class="room blair-room" id="scrapbook">
+
+    <div class="blair-bg"></div>
+
+    <div class="scrapbook">
+
+      <div class="scrap-deco flower1">🌼</div>
+      <div class="scrap-deco flower2">🌷</div>
+      <div class="scrap-deco butterfly1">🦋</div>
+      <div class="scrap-deco butterfly2">🦋</div>
+
+      <div class="paper one">
+        <div class="tape"></div>
+        <h3>little note</h3>
+        <p>
+          you somehow became my favorite person
+          without even trying.
+        </p>
+      </div>
+
+      <div class="paper two">
+        <div class="tape"></div>
+        <h3>another one</h3>
+        <p>
+          i like having you around.
+          probably more than i should admit.
+        </p>
+      </div>
+
+      <div class="paper three">
+        <div class="tape"></div>
+        <h3>if you ever wonder—</h3>
+        <p>
+          i don't really know why it's you.
+          <br><br>
+          i just know that
+          <br>
+          it's you.
+        </p>
+      </div>
+
+      <div class="paper four">
+        <div class="tape"></div>
+        <h3>for Blair</h3>
+        <p>
+          I love you most.
+          <br><br>
+          somewhere between all the jokes,
+          random conversations, sleepy disappearances,
+          and everything in between,
+          you became someone i never want to lose.
+          <br><br>
+          this little world is yours.
+          keep it. 💗
+        </p>
+      </div>
+
+    </div>
+
+    <button
+      class="nav-btn"
+      style="color:#765c50;border-color:rgba(118,92,80,.3);background:rgba(255,255,255,.35);"
+      onclick="goTo('goodbye')"
+    >
+      keep going →
+    </button>
+
+  </section>
+
+  <!-- ================= GOODBYE ================= -->
+
+  <section class="room" id="goodbye">
+
+    <div class="goodbye-card">
+
+      <div class="eyebrow">little goodbye</div>
+
+      <h1 class="title">you made it.</h1>
+
+      <br>
+
+      <p>
+        thank you for spending a little bit of your time
+        wandering through our tiny universe.
+      </p>
+
+      <p>
+        it's not a very big world.
+        just a few silly things,
+        a little bit of you,
+        and a lot of Jere being Jere.
+      </p>
+
+      <p>
+        but somehow,
+        it feels like ours.
+      </p>
+
+      <p>
+        thanks for staying until the end, blar.
+      </p>
+
+    </div>
+
+    <button class="nav-btn" onclick="goTo('deep')">
+      one last thing →
+    </button>
+
+  </section>
+
+  <!-- ================= DEEP SPACE ================= -->
+
+  <section class="room" id="deep">
+
+    <div class="deep-card">
+
+      <div class="eyebrow">deep space</div>
+
+      <div class="big-line">
+        I don't think I need some huge,
+        perfect explanation for why I love you.
+      </div>
+
+      <p>
+        It happened in all the small things.
+        In the way you talk to me.
+        The way you listen.
+        The way you make even the most random conversations
+        feel worth having.
+      </p>
+
+      <p>
+        I love how easy it feels to be myself around you.
+      </p>
+
+      <p>
+        Somehow, without either of us really planning it,
+        you became one of the people I look for.
+        The person whose absence I notice.
+        The person I want to tell things to.
+        The person I want around.
+      </p>
+
+      <p>
+        So if you ever wonder whether you're important to me...
+        you are.
+      </p>
+
+      <p>
+        A lot more than you probably realize.
+      </p>
+
+    </div>
+
+    <button class="nav-btn" onclick="goTo('ending')">
+      final stop →
+    </button>
+
+  </section>
+
+  <!-- ================= ENDING ================= -->
+
+  <section class="room" id="ending">
+
+    <div class="ending-card">
+
+      <div class="eyebrow">the end.</div>
+
+      <h1 class="title">
+        and that's it.
+      </h1>
+
+      <br>
+
+      <p>
+        You've reached the end of this little universe.
+      </p>
+
+      <p>
+        But unfortunately,
+      </p>
+
+      <p style="font-family:'Playfair Display',serif;font-size:22px;color:#eee8d8;">
+        you still have to deal with me. &gt;:3
+      </p>
+
+      <p>
+        thank you for staying.<br>
+        thank you for being you.
+      </p>
+
+      <p>
+        And, most importantly—
+      </p>
+
+      <p style="font-family:'Playfair Display',serif;font-size:25px;color:#d8bd77;">
+        I'm glad it's you.
+      </p>
+
+      <p style="margin-top:20px;color:#888578;">
+        with love, Jere
+      </p>
+
+    </div>
+
+  </section>
+
+</div>
+
+<script>
+
+/* =========================================================
+   ROOM NAVIGATION
+========================================================= */
+
+let currentRoom = "password";
+
+function goTo(nextRoom) {
+  const current = document.getElementById(currentRoom);
+  const next = document.getElementById(nextRoom);
+
+  if (!next || currentRoom === nextRoom) return;
+
+  current.classList.remove("fade-in");
+  current.classList.add("fade-out");
+
+  setTimeout(() => {
+    current.classList.remove("active", "fade-out");
+    next.classList.add("active", "fade-in");
+
+    currentRoom = nextRoom;
+
+    setTimeout(() => {
+      next.classList.remove("fade-in");
+    }, 500);
+
+  }, 280);
+}
+
+
+/* =========================================================
+   PASSWORD
+========================================================= */
+
+const mainPassword = "1509";
+const flutershyPassword = "flutershy";
+
+function checkMainPassword() {
+  const input = document.getElementById("mainInput");
+  const wrong = document.getElementById("mainWrong");
+
+  if (input.value.trim() === mainPassword) {
+    wrong.textContent = "";
+    goTo("sky");
+  } else {
+    wrong.textContent = "wrong universe. try again. -_-";
+    input.value = "";
+  }
+}
+
+function checkFlutershy() {
+  const input = document.getElementById("flutershyInput");
+  const wrong = document.getElementById("flutershyWrong");
+
+  if (input.value.trim().toLowerCase() === flutershyPassword) {
+    wrong.textContent = "";
+    goTo("cards");
+  } else {
+    wrong.textContent = "nope. try again, blar. >:3";
+    input.value = "";
+  }
+}
+
+document.getElementById("mainInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") checkMainPassword();
+});
+
+document.getElementById("flutershyInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") checkFlutershy();
+});
+
+
+/* =========================================================
+   QUIZ
+========================================================= */
+
+const questions = [
+
+  {
+    q: "Kenapa Jere rajin ngiler?",
+    a: [
+      "Karena tubuh Jere sudah mencapai tingkat kenyamanan yang tidak dapat dijelaskan secara medis",
+      "Karena gravitasi bulan bekerja terlalu kuat dan Jere apparently ikut merasa terpanggil",
+      "Emang anaknya rajin ngiler",
+      "Karena kebanyakan mikirin Blair sampai sistem tubuhnya ikut tidak bekerja sebagaimana mestinya"
+    ],
+    correct: 2
+  },
+
+  {
+    q: "Who usually starts the nonsense first?",
+    a: [
+      "Blair, according to highly questionable evidence",
+      "It just suddenly happens",
+      "Jere, obviously",
+      "Nobody knows anymore. The situation has evolved beyond human control."
+    ],
+    correct: 1
+  },
+
+  {
+    q: "What is Jere most likely doing right now?",
+    a: [
+      "Sleeping, because apparently consciousness is optional",
+      "Making something, despite claiming he was going to sleep",
+      "Eating, conducting an important investigation into snacks",
+      "Thinking about Blair"
+    ],
+    correct: 3
+  },
+
+  {
+    q: "What is Jere's natural habitat?",
+    a: [
+      "Around Blair",
+      "At his desk, where several unfinished ideas have formed a civilization",
+      "Somewhere in space, probably overthinking something unnecessary",
+      "Under a blanket, where productivity goes to disappear"
+    ],
+    correct: 0
+  },
+
+  {
+    q: "What does \"sebentar\" mean according to Jere?",
+    a: [
+      "Five minutes, assuming time behaves normally",
+      "Ten minutes, if Jere gets distracted halfway through",
+      "Until tomorrow, if the situation requires it",
+      "He'll be back in a minute"
+    ],
+    correct: 3
+  },
+
+  {
+    q: "What usually happens to Jere's nightly plans?",
+    a: [
+      "He gets surprisingly productive, which is frankly suspicious",
+      "He starts working on something and somehow loses track of time",
+      "He changes his mind halfway through because another idea appeared",
+      "He remembers them again the next morning and acts like nothing happened"
+    ],
+    correct: 1
+  },
+
+  {
+    q: "What does Jere do when he's bored?",
+    a: [
+      "Sleep, the traditional Jere solution",
+      "Scroll endlessly until the concept of time becomes meaningless",
+      "Make a little thing",
+      "Stare at the ceiling and contemplate absolutely unnecessary matters"
+    ],
+    correct: 2
+  },
+
+  {
+    q: "Why does Jere sometimes disappear?",
+    a: [
+      "He's busy, allegedly",
+      "He's making something and forgot the outside world exists",
+      "He got distracted doing something else, as usual",
+      "All of the above"
+    ],
+    correct: 3
+  },
+
+  {
+    q: "What is Jere secretly good at?",
+    a: [
+      "English, when his brain decides to cooperate",
+      "Editing things until 3 AM for absolutely no reason",
+      "Literature, mostly when being unnecessarily dramatic",
+      "All of the above. Jere has no weaknesses."
+    ],
+    correct: 3
+  },
+
+  {
+    q: "Complete the sentence: When Jere finally stops pretending he doesn't miss Blair, he says—",
+    a: [
+      "I'm tired.",
+      "Where are you?",
+      "Never mind.",
+      "I miss you."
+    ],
+    correct: 3
+  }
+
+];
+
+let quizIndex = 0;
+let quizScore = 0;
+
+function startQuiz() {
+  quizIndex = 0;
+  quizScore = 0;
+
+  document.getElementById("quizContent").style.display = "block";
+  document.getElementById("quizLoading").style.display = "none";
+  document.getElementById("quizResult").style.display = "none";
+
+  renderQuestion();
+}
+
+function renderQuestion() {
+
+  const item = questions[quizIndex];
+
+  document.getElementById("questionCount").textContent =
+    `QUESTION ${quizIndex + 1} / ${questions.length}`;
+
+  document.getElementById("question").textContent = item.q;
+
+  const answers = document.getElementById("answers");
+  answers.innerHTML = "";
+
+  item.a.forEach((answer, index) => {
+
+    const button = document.createElement("button");
+
+    button.className = "answer";
+    button.textContent = `${String.fromCharCode(65 + index)}. ${answer}`;
+
+    button.onclick = () => selectAnswer(index);
+
+    answers.appendChild(button);
+
+  });
+}
+
+function selectAnswer(index) {
+
+  if (index === questions[quizIndex].correct) {
+    quizScore++;
+  }
+
+  quizIndex++;
+
+  if (quizIndex < questions.length) {
+    renderQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+function finishQuiz() {
+
+  document.getElementById("quizContent").style.display = "none";
+  document.getElementById("quizLoading").style.display = "block";
+
+  setTimeout(() => {
+
+    document.getElementById("quizLoading").style.display = "none";
+    document.getElementById("quizResult").style.display = "block";
+
+    let title = "";
+    let text = "";
+
+    if (quizScore === 10) {
+      title = "damn.";
+      text = "you actually know me. suspicious. >:3";
+    } else if (quizScore >= 8) {
+      title = "okay.";
+      text = "that's pretty good. i'll let it slide. >v<";
+    } else if (quizScore >= 5) {
+      title = "hmm...";
+      text = "girlfriend privileges are under review. -_-";
+    } else if (quizScore >= 1) {
+      title = "excuse me?";
+      text = "who are you and what have you done to blair. >:3";
+    } else {
+      title = "we need to talk.";
+      text = "we need to have a serious conversation.";
+    }
+
+    document.getElementById("resultTitle").textContent =
+      `${quizScore} / ${questions.length} — ${title}`;
+
+    document.getElementById("resultText").textContent = text;
+
+  }, 2400);
+}
+
+
+/* =========================================================
+   PLANETS
+========================================================= */
+
+const planetData = {
+
+  sun: {
+    title: "the center",
+    text:
+`Everything has a center.
+Mine just happens to be a certain someone.
+
+Don't get too smug about it. >:3`
+  },
+
+  moon: {
+    title: "the sleepy one",
+    text:
+`This one is for the nights
+when Jere says he's still awake.
+
+Spoiler:
+
+he isn't.`
+  },
+
+  saturn: {
+    title: "obviously.",
+    text:
+`You already knew this one
+was going to be here.
+
+Don't ask questions.
+
+It's Saturn. -_-`
+  },
+
+  earth: {
+    title: "home",
+    text:
+`Somewhere along the way,
+talking to you started feeling
+a little like coming home.`
+  },
+
+  little: {
+    title: "classified information",
+    text:
+`Random Jere fact:
+
+He can be talking to you one minute
+and completely unconscious the next.
+
+Skill issue?
+
+Absolutely not.
+
+It's a talent.`
+  }
+
+};
+
+let planetsFound = 0;
+
+function planet(name) {
+
+  const data = planetData[name];
+
+  document.getElementById("pmTitle").textContent = data.title;
+  document.getElementById("pmText").textContent = data.text;
+
+  planetsFound++;
+
+  if (name === "little") {
+    document.getElementById("pmTitle").textContent = "you found me.";
+    document.getElementById("pmText").textContent =
+`Congratulations.
+
+Your reward:
+
+me being annoying for the rest of the day. >:3`;
+
+    document.getElementById("planetNext").classList.remove("hidden");
+  }
+}
+
+
+/* =========================================================
+   BLAIR FAVORITES
+========================================================= */
+
+const favoriteMessages = {
+
+  romcom:
+    "because apparently fictional couples deserve your emotional investment. >:3",
+
+  olivia:
+    "because obviously. no further explanation required.",
+
+  teh:
+    "a very serious matter. Jere will not be taking questions.",
+
+  thai:
+    "also a very serious matter. this is basically research.",
+
+  dimsum:
+    "always acceptable. this one is non-negotiable.",
+
+  pipup:
+    "yes. pipup. I said what I said. 🌸"
+
+};
+
+function showFavorite(name) {
+  document.getElementById("favoriteText").textContent =
+    favoriteMessages[name];
+}
+
+
+/* =========================================================
+   WHY YOU
+========================================================= */
+
+const whySteps = [
+
+  {
+    title: "why you.",
+    text: "there are a few things i could tell you."
+  },
+
+  {
+    title: "the way you talk.",
+    text:
+      "there's something about the way you talk to me that makes even the most random things feel worth talking about."
+  },
+
+  {
+    title: "the way you listen.",
+    text:
+      "you make conversations feel like they're actually shared between two people."
+  },
+
+  {
+    title: "the way you appreciate people.",
+    text:
+      "you genuinely make the person you're talking to feel heard and appreciated."
+  },
+
+  {
+    title: "the little things.",
+    text:
+      "somehow, it's always the small things that stay with me."
+  },
+
+  {
+    title: "and then there's you.",
+    text:
+      "somewhere along the way, you became someone i look for.<br>someone i want around.<br><br>that's probably why. >v<"
+  }
+
+];
+
+let whyIndex = 0;
+
+function nextWhy() {
+
+  whyIndex++;
+
+  if (whyIndex >= whySteps.length) {
+
+    goTo("scrapbook");
+    whyIndex = 0;
+    return;
+
+  }
+
+  const step = whySteps[whyIndex];
+
+  document.getElementById("whyContent").innerHTML = `
+    <div class="why-line">${step.title}</div>
+    <div class="why-text">${step.text}</div>
+  `;
+
+  if (whyIndex === whySteps.length - 1) {
+    document.getElementById("whyButton").textContent = "okay. >v<";
+  }
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+startQuiz();
+
+</script>
+
+</body>
+</html>
